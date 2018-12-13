@@ -26,33 +26,31 @@ class SaveController extends Controller{
         $user = $this->session->get('user');
         $user_id = $user['id'];
         $save_result = $this->db_manager->get('Save')->showSave($user_id);
-        $image_result = $this->db_manager->get('Save')->showImageInSave($user_id);
+
         return $this->render(array(
             'user' => $user,
             'save_result' => $save_result,
-            'image_result' => $image_result,
             '_token' => $this->generateCsrfToken('save/show')
         ), 'show');
     }
 
     public function imageViewAction(){
-
         $user = $this->session->get('user');
         $user_id = $user['id'];
+
         $result = $this->db_manager->get('Save')->showImageInSave($user_id);
-        if($result && isset($result['image'])){
-            if($result['extension'] === 'image/jpeg'){
-                header("Content-Type: image/jpeg");
-                header('X-Content-Type-Options: nosniff');
-            } elseif($result['extension'] === 'image/png'){
-                header("Content-Type: image/png");
-                header('X-Content-Type-Options: nosniff');
-            }
-            $image = $result["image"];
-            return $this->render(array(
-                'image' =>  $image
-            ), 'image_view');
-        }
+
+        // 画面に渡す画像データ
+        $extension = $result[0];
+        $image = $result[1];
+
+        // BLOBに変換
+
+        return $this->render(array(
+            'extension' => $extension,
+            'image' => $image,
+            '_token' => $this->generateCsrfToken('save/image')
+        ), 'image_view');
     }
 
     public function insertAction(){
@@ -61,11 +59,9 @@ class SaveController extends Controller{
         $save = $this->db_manager->get('Save')->showSave($user_id);
         $save_id = $save['save_id'];
 
-        $warning = array();
-
         // 1ユーザがシート登録できるのは1つまで
         if(isset($save_id)){
-            $error[]= '1ユーザが登録できるシートは1つまでです。既存のシートを更新してください。';
+            $error[] = '1ユーザが登録できるシートは1つまでです。既存のシートを更新してください。';
         }
         return $this->render(array(
             'user' => $user,
@@ -104,6 +100,7 @@ class SaveController extends Controller{
         $save_fname = null;
         $save_image = null;
         $extension = null;
+
         // 画像ファイルがアップロードされた時のチェック
         if(!empty($save_img)){
             $max_size = 4 * 1024 * 1024;
@@ -116,7 +113,7 @@ class SaveController extends Controller{
             }else if($_FILES['save_image']['size'] > $max_size){
                 $errors['size'] = 'ファイルのサイズは4MB以下でアップロードしてください。';
             }elseif(!$file = fopen($_FILES['save_image']['tmp_name'], 'rb')){
-                $errors['fopen'] = '画像を開けませんでした。';
+                $errors['fopen'] = '他の原因で画像を開けませんでした。';
             }else{
                 $image = fread($file, $_FILES['save_image']['size']);
                 $save_image = $this->session->set('image', $image);
@@ -153,11 +150,11 @@ class SaveController extends Controller{
                 ), 'insert_confirm');
     }
 
-
     public function insertSubmitAction(){
         $user = $this->session->get('user');
         $user_id = $user['id'];
 
+        // 確認画面で戻るボタンが押された場合
         $insert_back = $this->request->getPost('insert_back');
         if(isset($insert_back)){
             return $this->render(array(
@@ -165,6 +162,7 @@ class SaveController extends Controller{
                 '_token' => $this->generateCsrfToken('save/insert')
             ), 'insert');
         }
+
 
         $save_reason = $this->request->getPost('save_reason');
         $save_money = $this->request->getPost('save_money');

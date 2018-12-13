@@ -24,6 +24,17 @@ abstract class DbRepository{
     }
 
     /**
+     * プリペアドステートメントを作成
+     * @param string $sql
+     * @return PDOStatement $stmt
+     */
+    public function setPrepareStmt($sql){
+        $stmt = $this->con->prepare($sql);
+        return $stmt;
+    }
+
+
+    /**
      * クエリを実行
      * @param string $sql
      * @param array $params

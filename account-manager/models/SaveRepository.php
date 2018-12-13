@@ -18,34 +18,52 @@ class SaveRepository extends DbRepository{
 
     // 貯金目標シートの画像を表示する
     public function showImageInSave($user_id){
-        $image_sql = "SELECT * FROM image WHERE user_id = :user_id";
-        $image_stmt = $this->fetchAll($image_sql, array(
-            ':user_id' => $user_id
-        ));
-        return $image_stmt;
+        $sql = "SELECT save_extension, save_image FROM save WHERE user_id = :user_id";
+        $stmt = $this->setPrepareStmt($sql);
+        $stmt->execute(array(':user_id'=> $user_id));
+        $stmt->bindColumn(1, $extension, PDO::PARAM_STR);
+        $stmt->bindColumn(2, $image, PDO::PARAM_LOB);
+        $stmt->fetch(PDO::FETCH_BOUND);
+
+        // 画像表示の配列
+        $display_picture = array();
+        array_push($display_picture, $extension, $image);
+
+        return $display_picture;
+
     }
 
     // 貯金目標シートの入力項目の登録処理
     public function insertSave($user_id, $reason, $money, $wish, $patience, $extension, $image){
 
-        // saveテーブルの新規追加
-        $save_sql = "INSERT INTO save (user_id, save_reason, save_money, save_wish, save_patience)
-                VALUES(:user_id, :save_reason, :save_money, :save_wish, :save_patience)";
+        if(empty($extension) && empty($image)){
+            $extension = null;
+            $image = null;
+            $sql = "INSERT INTO save (user_id, save_reason, save_money, save_wish, save_patience, save_extension, save_image)
+                VALUES(:user_id, :save_reason, :save_money, :save_wish, :save_patience, :save_extension, :save_image)";
+            $stmt = $this->execute($sql,array(
+                ':user_id' => $user_id,
+                ':save_reason' => $reason,
+                ':save_money' => $money,
+                ':save_wish' => $wish,
+                ':save_patience' => $patience,
+                'save_extension' => $extension,
+                'save_image' => $image
+            ));
+        }
 
-        $save_stmt = $this->execute($save_sql, array(
+        $sql = "INSERT INTO save (user_id, save_reason, save_money, save_wish, save_patience, save_extension, save_image)
+                VALUES(:user_id, :save_reason, :save_money, :save_wish, :save_patience, :save_extension, :save_image)";
+        $stmt = $this->execute($sql,array(
             ':user_id' => $user_id,
             ':save_reason' => $reason,
             ':save_money' => $money,
             ':save_wish' => $wish,
             ':save_patience' => $patience,
+            'save_extension' => $extension,
+            'save_image' => $image
         ));
 
-        $image_sql = "INSERT INTO image (user_id, extension, image) VALUES(:user_id, :extension, :image)";
-        $image_stmt = $this->execute($image_sql, array(
-            ':user_id' => $user_id,
-            ':extension' => $extension,
-            ':image' => $image
-        ));
     }
 
     // 貯金目標シートの更新処理

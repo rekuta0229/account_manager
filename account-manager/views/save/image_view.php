@@ -1,6 +1,6 @@
 <?php $this->setLayoutVar('title', '貯金目標シート') ?>
 
-<h2>貯金目標入力一覧</h2>
+<h2>貯金目標　画像表示</h2>
 
 <nav>
 	<ul>
@@ -12,4 +12,16 @@
 	</ul>
 </nav>
 
-<?php echo $image;?>
+<?php
+// 画像の拡張子を指定
+if($extension === "image/jpeg"){
+    header("Content-Type :" . $extension);
+    header("X-Content-Type-Options: nosniff");
+}
+if($extension === "image/png"){
+    header("Content-Type :" . $extension);
+    header("X-Content-Type-Options: nosniff");
+}
+<img src= "data:".<?php echo $extension;?>.";base64,".<?php echo base64_encode($image);>>>
+
+?>
