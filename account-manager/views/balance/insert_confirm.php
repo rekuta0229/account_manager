@@ -23,7 +23,7 @@
 	<tr>
 		<th>用途</th>
 		<td><?php echo $this->escape($contents);?></td>
-    	<input type = "hidden" name = "date" value ="<?php echo $this->escape($contents);?>">
+    	<input type = "hidden" name = "contents" value ="<?php echo $this->escape($contents);?>">
 	</tr>
 	<tr>
 		<th>入金額</th>

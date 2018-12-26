@@ -55,22 +55,3 @@ foreach($save_result as $save){
 	</tr>
 </table>
 
-<img id = "img1" src"" />
-
-<script type = "text/javascript">
-function imageView(){
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET' , fp , true);
-	xhr.responseType = 'blob';
-	xhr.onload = (e) =>{
-
-		// Blobを取得
-		var blob = e.target.response;
-
-		// BLOBwoURLスキームに変換して、img要素にセット
-		var blob_url = window.URL.createObjectURL(blob);
-		$('#img1').attr('src' ,blob_url);
-	};
-	xhr.send();
-}
-</script>

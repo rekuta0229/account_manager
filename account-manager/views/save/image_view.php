@@ -22,6 +22,7 @@ if($extension === "image/png"){
     header("Content-Type :" . $extension);
     header("X-Content-Type-Options: nosniff");
 }
-<img src= "data:".<?php echo $extension;?>.";base64,".<?php echo base64_encode($image);>>>
 
+
+echo $image;
 ?>

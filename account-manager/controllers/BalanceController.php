@@ -79,6 +79,11 @@ class BalanceController extends Controller{
         $deposit = $this->request->getPost('deposit');
         $payment = $this->request->getPost('payment');
 
+
+        var_dump($date);
+        var_dump($contents);
+        var_dump($deposit);
+        var_dump($payment);
         $errors = array();
 
         if(empty($date)){
